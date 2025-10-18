@@ -2,6 +2,7 @@ export interface Photo {
   id: number;
   src: string;
   rotation: number;
+  order: number;
 }
 
 export interface PieceCountItem {
@@ -19,13 +20,18 @@ export interface ContainerData {
   discrepancies: string;
   photos: Photo[];
   timestamp: string;
-  status: string;
+  status: 'draft' | 'completed';
+  pdfUrl?: string;
+  driveLink?: string;
+  driveFolderId?: string;
+  updatedAt: string;
 }
 
 export const BOX_BLUE = '#0061D5';
 export const BOX_DARK_BLUE = '#003D80';
 export const BOX_LIGHT_BLUE = '#E8F2FF';
 export const BOX_SUCCESS = '#26C281';
+export const BOX_WARNING = '#F7B924';
 export const BOX_GRAY = '#767676';
 export const BOX_BORDER = '#E8E8E8';
 

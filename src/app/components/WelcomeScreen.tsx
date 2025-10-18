@@ -1,29 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { Package, ArrowRight } from 'lucide-react';
-import { BOX_BLUE } from './types';
+import { BOX_BLUE } from '../types';
 
-export default function WelcomePage() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
+interface WelcomeScreenProps {
+  onSkip: () => void;
+}
 
-  useEffect(() => {
-    if (status === 'loading') return;
-    
-    const timer = setTimeout(() => {
-      if (session) {
-        router.push('/dashboard');
-      } else {
-        router.push('/auth/signin');
-      }
-    }, 2500);
-    
-    return () => clearTimeout(timer);
-  }, [session, status, router]);
-
+export default function WelcomeScreen({ onSkip }: WelcomeScreenProps) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center" style={{ backgroundColor: BOX_BLUE }}>
       <div className="text-center">
@@ -42,7 +26,7 @@ export default function WelcomePage() {
         </div>
       </div>
       <button
-        onClick={() => router.push(session ? '/dashboard' : '/auth/signin')}
+        onClick={onSkip}
         className="absolute bottom-8 right-8 px-6 py-3 bg-white rounded-full flex items-center gap-2 font-medium shadow-lg hover:shadow-xl transition-all"
         style={{ color: BOX_BLUE }}
       >

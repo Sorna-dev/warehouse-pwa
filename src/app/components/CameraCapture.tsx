@@ -4,20 +4,27 @@ import { useRef, useEffect } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { Photo } from '../types';
 
-interface CameraScreenProps {
+interface CameraCaptureProps {
   photos: Photo[];
   setPhotos: (photos: Photo[]) => void;
   onClose: () => void;
 }
 
-export default function CameraScreen({ photos, setPhotos, onClose }: CameraScreenProps) {
+export default function CameraCapture({ photos, setPhotos, onClose }: CameraCaptureProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    startCamera();
+    return () => {
+      stopCamera();
+    };
+  }, []);
 
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
+        video: { facingMode: 'environment', width: 1920, height: 1080 },
       });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -28,15 +35,12 @@ export default function CameraScreen({ photos, setPhotos, onClose }: CameraScree
     }
   };
 
-  useEffect(() => {
-    startCamera();
-    return () => {
-      if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, []);
+  const stopCamera = () => {
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+    }
+  };
 
   const capturePhoto = () => {
     const video = videoRef.current;
@@ -48,7 +52,12 @@ export default function CameraScreen({ photos, setPhotos, onClose }: CameraScree
       if (ctx) {
         ctx.drawImage(video, 0, 0);
         const imageData = canvas.toDataURL('image/jpeg', 0.85);
-        setPhotos([...photos, { id: Date.now(), src: imageData, rotation: 0 }]);
+        setPhotos([...photos, { 
+          id: Date.now(), 
+          src: imageData, 
+          rotation: 0,
+          order: photos.length 
+        }]);
         onClose();
       }
     }
